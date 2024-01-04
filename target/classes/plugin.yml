@@ -1,0 +1,17 @@
+main: cla.Entt.ClansX.ClansX
+version: 1.0.0
+name: ClansX
+author: Enttbot
+api-version: "1.13"
+
+commands:
+  clansx:
+    description: The main command to control the plugin. Only for admins!
+    aliases:
+      - cx
+      - csx
+  clans:
+    description: The main command to control clansx. for users
+    aliases:
+      - cs
+      - cla
