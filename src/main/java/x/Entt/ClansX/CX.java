@@ -1,6 +1,7 @@
 package x.Entt.ClansX;
 
 import net.milkbowl.vault.economy.Economy;
+
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -14,16 +15,15 @@ import x.Entt.ClansX.Utils.*;
 import net.md_5.bungee.api.chat.ClickEvent;
 import net.md_5.bungee.api.chat.TextComponent;
 
-import java.io.IOException;
 import java.util.Objects;
 
 public class CX extends JavaPlugin {
+   public String version = getDescription().getVersion();
    public static Economy econ;
    public static String prefix;
    private FileHandler fh;
-   private Updater updater;
 
-   @Override
+    @Override
    public void onEnable() {
       saveDefaultConfig();
       prefix = getConfig().getString("prefix", "&3&L[Clans&b&lX&3&l] ");
@@ -40,15 +40,11 @@ public class CX extends JavaPlugin {
       registerEvents();
       registerFiles();
 
-      updater = new Updater(this, 114316);
+        Updater updater = new Updater(this, 114316);
 
-      try {
-         searchUpdates();
-      } catch (IOException e) {
-         getLogger().severe("Failed to check for updates: " + e.getMessage());
-      }
+        searchUpdates();
 
-      if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
          new PAPI(this).registerPlaceholders();
       }
 
@@ -78,24 +74,36 @@ public class CX extends JavaPlugin {
       fh.saveDefaults();
    }
 
-   public void searchUpdates() throws IOException {
+   public void searchUpdates() {
       String downloadUrl = "https://www.spigotmc.org/resources/clansx-the-best-clan-system-1-8-1-21.114316/";
-      TextComponent link = new TextComponent(MSG.color("&e&lDownload at: &f" + downloadUrl));
+      TextComponent link = new TextComponent(MSG.color("&e&lClick here to download the update!"));
       link.setClickEvent(new ClickEvent(ClickEvent.Action.OPEN_URL, downloadUrl));
 
-      if (updater.isUpdateAvailable()) {
-         logToConsole("&2&l============= " + prefix + "&2&l=============");
-         logToConsole("&6&lNEW VERSION AVAILABLE!");
-         logToConsole("&e&lCurrent Version: &f" + getDescription().getVersion());
-         logToConsole("&e&lLatest Version: &f" + updater.getLatestVersion());
+      boolean updateAvailable = false;
+      String latestVersion = "unknown";
+
+      try {
+         Updater updater = new Updater(this, 115289);
+         updateAvailable = updater.isUpdateAvailable();
+         latestVersion = updater.getLatestVersion();
+      } catch (Exception e) {
+         logToConsole("&cError checking for updates: " + e.getMessage());
+      }
+
+      if (updateAvailable) {
+         Bukkit.getConsoleSender().sendMessage(MSG.color("&2&l============= " + prefix + "&2&l============="));
+         Bukkit.getConsoleSender().sendMessage(MSG.color("&6&lNEW VERSION AVAILABLE!"));
+         Bukkit.getConsoleSender().sendMessage(MSG.color("&e&lCurrent Version: &f" + version));
+         Bukkit.getConsoleSender().sendMessage(MSG.color("&e&lLatest Version: &f" + latestVersion));
+         Bukkit.getConsoleSender().sendMessage(MSG.color("&e&lDownload it here: &f" + downloadUrl));
+         Bukkit.getConsoleSender().sendMessage(MSG.color("&2&l============= " + prefix + "&2&l============="));
 
          for (Player player : Bukkit.getOnlinePlayers()) {
-            player.spigot().sendMessage(link);
+            if (player.hasPermission("cx.admin")) {
+               player.sendMessage(MSG.color(prefix + "&e&lA new plugin update is available!"));
+               player.spigot().sendMessage(link);
+            }
          }
-
-         logToConsole("&2&============= " + prefix + "&2&l=============");
-      } else {
-         logToConsole("&a&lYour plugin is up to date!");
       }
    }
 

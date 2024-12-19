@@ -9,16 +9,15 @@ import java.net.URL;
 import java.util.Scanner;
 
 public class Updater {
-
-    private static CX plugin;
-    private static int resourceId;
+    private final CX plugin;
+    private final int resourceId;
 
     public Updater(CX plugin, int resourceId) {
-        Updater.plugin = plugin;
-        Updater.resourceId = resourceId;
+        this.plugin = plugin;
+        this.resourceId = resourceId;
     }
 
-    public static String getLatestVersion() throws IOException {
+    public String getLatestVersion() throws IOException {
         URL url = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + resourceId);
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
         connection.setRequestMethod("GET");
@@ -35,7 +34,7 @@ public class Updater {
         return null;
     }
 
-    public static boolean isUpdateAvailable() {
+    public boolean isUpdateAvailable() {
         try {
             String currentVersion = plugin.getDescription().getVersion();
             String latestVersion = getLatestVersion();

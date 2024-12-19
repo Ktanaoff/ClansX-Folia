@@ -1,7 +1,7 @@
 package x.Entt.ClansX.CMDs;
 
-import org.bukkit.Bukkit;
 import org.jetbrains.annotations.NotNull;
+
 import x.Entt.ClansX.CX;
 import x.Entt.ClansX.Utils.FileHandler;
 import x.Entt.ClansX.Utils.MSG;
@@ -11,6 +11,7 @@ import static x.Entt.ClansX.CX.prefix;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -406,12 +407,12 @@ public class CCMD implements CommandExecutor, TabCompleter {
 
         String formattedMessage = String.join(" ", message);
 
-        player.sendMessage(MSG.color(player, "&e" + getPlayerClan(player.getName()) + " &f" + player.getName() + "&f: &7" + formattedMessage));
+        player.sendMessage(MSG.color("&e" + getPlayerClan(player.getName()) + " &f" + player.getName() + "&f: &7" + formattedMessage));
 
         for (String userName : users) {
             Player recipient = this.plugin.getServer().getPlayer(userName);
             if (recipient != null && recipient != player) {
-                recipient.sendMessage(MSG.color(recipient, "&e" + getPlayerClan(player.getName()) + " &f" + player.getName() + "&f: &7" + formattedMessage));
+                recipient.sendMessage(MSG.color("&e" + getPlayerClan(player.getName()) + " &f" + player.getName() + "&f: &7" + formattedMessage));
             }
         }
     }

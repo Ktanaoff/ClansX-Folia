@@ -16,11 +16,11 @@
 #                                                              #
 #                        Placeholders :                        #
 #  ---------------------------------------------------------   #
-#  |   %cx.prefix%      : Plugin prefix                    |   #
-#  |   %cx.clan.leader% : Clan leader's name               |   #
-#  |   %cx.clan.membercount% : Number of clan members      |   #
-#  |   %cx.clan.founder% : Clan founder's name             |   #
-#  |   %cx.clan.name%   : Clan's name                      |   #
+#  |   %cx_prefix%      : Plugin prefix                    |   #
+#  |   %cx_clan_leader% : Clan leader's name               |   #
+#  |   %cx_clan_membercount% : Number of clan members      |   #
+#  |   %cx_clan_founder% : Clan founder's name             |   #
+#  |   %cx_clan_name%   : Clan's name                      |   #
 #  ---------------------------------------------------------   #
 #        Now you can use PlaceholderAPI´s placeholders.        #
 #                                                              #
@@ -33,9 +33,9 @@ welcome-message:
   message:
     - "&f--------------------------------"
     - " "
-    - "&e&lA player from your clan has joined"
-    - "&e&lGreeting to player %player%"
-    - "&2&lMessage by %prefix%"
+    - "&e&lA player from your clan %cx_clan_name% has joined"
+    - "&e&lGreeting to player %player_name%"
+    - "&2&lMessage by %cx_prefix%"
     - " "
     - "&f--------------------------------"
 
