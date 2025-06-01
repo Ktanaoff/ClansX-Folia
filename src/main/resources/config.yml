@@ -43,7 +43,7 @@ welcome-message:
 # If you write 0 in all values, the interaction with the vault is converted to 0, that is, it will say something like this:
 # [ClansX] you successfully created clan %cx.clan.name% [cost].
 vault-integration:
-  enabled: true
+  enabled: false
 
   cost:
     create-clan: 5 # always up to 0
