@@ -1,15 +1,13 @@
 package x.Entt.ClansX;
 
-import net.milkbowl.vault.economy.Economy;
-
 import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
-import org.bukkit.plugin.RegisteredServiceProvider;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import x.Entt.ClansX.CMDs.CCMD;
 import x.Entt.ClansX.CMDs.ACMD;
-import x.Entt.ClansX.Events.Listener;
+import x.Entt.ClansX.CMDs.PECMD;
+import x.Entt.ClansX.Events.Events;
 import x.Entt.ClansX.Utils.*;
 
 import net.md_5.bungee.api.chat.ClickEvent;
@@ -19,59 +17,69 @@ import java.util.Objects;
 
 public class CX extends JavaPlugin {
    public String version = getDescription().getVersion();
-   public static Economy econ;
    public static String prefix;
+   public static Econo econ;
+   private Updater updater;
+   private Metrics metrics;
    private FileHandler fh;
 
-    @Override
+   @Override
    public void onEnable() {
       saveDefaultConfig();
       prefix = getConfig().getString("prefix", "&3&L[Clans&b&lX&3&l] ");
       fh = new FileHandler(this);
-
-      if (getConfig().getBoolean("vault-integration.enabled", true) && !setupEconomy()) {
-         getLogger().severe("Vault dependency not found, disabling plugin!");
-         Bukkit.getPluginManager().disablePlugin(this);
-         return;
+      updater = new Updater(this, 114316);
+      metrics = new Metrics(this, 20912);
+      econ = new Econo(this);
+      if (getConfig().getBoolean("economy.enabled", true)) {
+         if (!econ.setupEconomy()) {
+            getLogger().severe("Can´t load the economy system.");
+            fh.getConfig().set("economy.enabled", false);
+            fh.saveConfig();
+            getLogger().severe("Economy system disabled.");
+            return;
+         }
       }
+
+      fh.saveDefaults();
 
       setupMetrics();
       registerCommands();
       registerEvents();
-      registerFiles();
+      searchUpdates();
 
-        Updater updater = new Updater(this, 114316);
-
-        searchUpdates();
-
-        if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
+      if (Bukkit.getPluginManager().getPlugin("PlaceholderAPI") != null) {
          new PAPI(this).registerPlaceholders();
       }
 
-      logToConsole("&av" + getDescription().getVersion() + " &2Enabled!");
+      Bukkit.getConsoleSender().sendMessage(MSG.color("&av" + getDescription().getVersion() + " &2Enabled!"));
    }
 
    @Override
    public void onDisable() {
-      logToConsole("&av" + getDescription().getVersion() + " &cDisabled");
+      Bukkit.getConsoleSender().sendMessage(MSG.color("&av" + getDescription().getVersion() + " &cDisabled"));
    }
 
    private void setupMetrics() {
-      new Metrics(this, 20912).addCustomChart(new Metrics.SimplePie("vault_enabled",
-              () -> getConfig().getString("vault-integration.enabled", "true")));
+      int max = getConfig().getInt("max-clans", -1);
+      String maxClans = (max <= 0) ? "Unlimited" : String.valueOf(max);
+
+      metrics.addCustomChart(new Metrics.SimplePie("economy_enabled",
+              () -> String.valueOf(getConfig().getBoolean("economy.enabled", true))));
+      metrics.addCustomChart(new Metrics.SimplePie("economy_system",
+              () -> getConfig().getString("economy.system", "Unknown")));
+      metrics.addCustomChart(new Metrics.SimplePie("max_clans",
+              () -> maxClans));
    }
 
    private void registerCommands() {
       Objects.requireNonNull(getCommand("clansx")).setExecutor(new ACMD(this));
       Objects.requireNonNull(getCommand("clans")).setExecutor(new CCMD(this));
+      Objects.requireNonNull(getCommand("cxstats")).setExecutor(new PECMD(this));
    }
 
    private void registerEvents() {
-      getServer().getPluginManager().registerEvents(new Listener(this), this);
-   }
-
-   public void registerFiles() {
-      fh.saveDefaults();
+      getServer().getPluginManager().registerEvents(new Events(this), this);
    }
 
    public void searchUpdates() {
@@ -83,11 +91,11 @@ public class CX extends JavaPlugin {
       String latestVersion = "unknown";
 
       try {
-         Updater updater = new Updater(this, 115289);
+         updater = new Updater(this, 114316);
          updateAvailable = updater.isUpdateAvailable();
          latestVersion = updater.getLatestVersion();
       } catch (Exception e) {
-         logToConsole("&cError checking for updates: " + e.getMessage());
+         Bukkit.getConsoleSender().sendMessage(MSG.color("&cError checking for updates: " + e.getMessage()));
       }
 
       if (updateAvailable) {
@@ -107,18 +115,8 @@ public class CX extends JavaPlugin {
       }
    }
 
-   private boolean setupEconomy() {
-      RegisteredServiceProvider<Economy> provider = getServer().getServicesManager().getRegistration(Economy.class);
-      econ = (provider != null) ? provider.getProvider() : null;
-
-      if (econ == null) {
-         logToConsole("&cEconomyProvider is null");
-      }
-      return econ != null;
-   }
-
-   private void logToConsole(String message) {
-      Bukkit.getConsoleSender().sendMessage(MSG.color(prefix + message));
+   public static Econo getEcon() {
+      return econ;
    }
 
    public FileHandler getFH() {

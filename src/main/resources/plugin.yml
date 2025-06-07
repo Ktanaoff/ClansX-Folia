@@ -1,5 +1,5 @@
 main: x.Entt.ClansX.CX
-version: 1.1.3
+version: 1.1.5
 name: ClansX
 author: Enttbot
 api-version: "1.13"
@@ -12,6 +12,9 @@ commands:
   clans:
     description: The command for clans (creating, deleting, etc). For users
     aliases: [cls]
+  cxstats:
+    description: The command for see the player stats of ClansX.
+    aliases: [cxs]
 
 permissions:
   cx.*:
@@ -19,9 +22,10 @@ permissions:
     default: op
     children:
       cx.admin: true
+      cx.user: true
   cx.admin:
     default: op
     description: Get access to admin commands.
   cx.user:
-    default: not op
+    default: true
     description: Get access to user commands.

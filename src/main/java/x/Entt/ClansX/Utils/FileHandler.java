@@ -1,12 +1,11 @@
 package x.Entt.ClansX.Utils;
 
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import x.Entt.ClansX.CX;
 
 import java.io.File;
 import java.io.IOException;
-
-import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.configuration.file.YamlConfiguration;
 
 public class FileHandler {
     private CX plugin;

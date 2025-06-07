@@ -10,7 +10,7 @@
 #   `"Y88888888"  dP"   "Y8
 #         [By Enttbot].
 #
-#        CONFIG.YML (v2)
+#        CONFIG.YML (v2.2)
 
 ################################################################
 #                                                              #
@@ -18,9 +18,13 @@
 #  ---------------------------------------------------------   #
 #  |   %cx_prefix%      : Plugin prefix                    |   #
 #  |   %cx_clan_leader% : Clan leader's name               |   #
-#  |   %cx_clan_membercount% : Number of clan members      |   #
 #  |   %cx_clan_founder% : Clan founder's name             |   #
 #  |   %cx_clan_name%   : Clan's name                      |   #
+#  |   %cx_clan_money%   : See the money vault of the clan |   #
+#  |   %cx_clan_membercount_offline% : Members offline     |   #
+#  |   %cx_clan_membercount_online% : Members online       |   #
+#  |   %cx_clan_membercount% : Number of clan members      |   #
+#  |   %cx_player_money% : The money vault of the player   |   #
 #  ---------------------------------------------------------   #
 #        Now you can use PlaceholderAPI´s placeholders.        #
 #                                                              #
@@ -30,26 +34,35 @@ prefix: "&3&L[Clans&b&lX&3&l]: "
 
 welcome-message:
   enabled: true
-  message:
+
+  no-clan:
     - "&f--------------------------------"
-    - " "
-    - "&e&lA player from your clan %cx_clan_name% has joined"
-    - "&e&lGreeting to player %player_name%"
-    - "&2&lMessage by %cx_prefix%"
-    - " "
+    - "&eWelcome back!"
+    - "&7Use &a/cl create &7to create your clan."
     - "&f--------------------------------"
 
-# This is required and should not be set to 0
-# If you write 0 in all values, the interaction with the vault is converted to 0, that is, it will say something like this:
-# [ClansX] you successfully created clan %cx.clan.name% [cost].
-vault-integration:
+  self-clan:
+    - "&f--------------------------------"
+    - "&eYou are in clan &a%cx_clan_name%"
+    - "&7Online members: &a%cx_clan_membercount_online%&7/&f%cx_clan_membercount%"
+    - "&f--------------------------------"
+
+  to-clan:
+    - "&f--------------------------------"
+    - "&a%player_name% &7from the clan has joined the server"
+    - "&f--------------------------------"
+
+max-clans: 50 # 0 = unlimited
+
+economy:
   enabled: true
+  system: "Vault" # Vault / Internal (ClansX economy system)
 
   cost:
-    create-clan: 5 # always up to 0
+    create-clan: 5
   earn:
-    delete-clan: 1 # always up to 0
-    kill-enemy: 2.5 # always up to 0
+    delete-clan: 1
+    kill-enemy: 2.5
 
 names-blocked:
   # Put here the names that you do not accept for a clan.
@@ -58,3 +71,4 @@ names-blocked:
     - "shit"
     - "fuck"
     - "nigga"
+    - "KKK"

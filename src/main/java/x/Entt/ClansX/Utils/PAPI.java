@@ -1,21 +1,25 @@
 package x.Entt.ClansX.Utils;
 
 import me.clip.placeholderapi.expansion.PlaceholderExpansion;
+
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
 import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.entity.Player;
 import org.jetbrains.annotations.NotNull;
+
 import x.Entt.ClansX.CX;
+
 import java.util.List;
 
 public class PAPI extends PlaceholderExpansion {
 
     private final CX plugin;
-    private final FileConfiguration dataConfig;
+    private final FileConfiguration data;
 
     public PAPI(CX plugin) {
         this.plugin = plugin;
-        this.dataConfig = plugin.getFH().getData();
+        this.data = plugin.getFH().getData();
     }
 
     @Override
@@ -30,7 +34,7 @@ public class PAPI extends PlaceholderExpansion {
 
     @Override
     public @NotNull String getAuthor() {
-        return plugin.getDescription().getAuthors().toString();
+        return String.join(", ", plugin.getDescription().getAuthors());
     }
 
     @Override
@@ -40,31 +44,62 @@ public class PAPI extends PlaceholderExpansion {
 
     @Override
     public String onPlaceholderRequest(Player player, @NotNull String identifier) {
-        if (player == null) return null;
+        if (player == null) return "no player";
+
+        Econo econ = CX.getEcon();
+
         String clanName = getPlayerClan(player.getName());
+        if (clanName == null) return "no clan";
 
         switch (identifier.toLowerCase()) {
-            case "prefix":
+            case "prefix": {
                 return CX.prefix;
-            case "clan_leader":
-                return (clanName != null) ? dataConfig.getString("Clans." + clanName + ".Leader", "N/A") : "No Clan";
-            case "clan_membercount":
-                return (clanName != null) ? String.valueOf(dataConfig.getStringList("Clans." + clanName + ".Users").size()) : "No Clan";
-            case "clan_founder":
-                return (clanName != null) ? dataConfig.getString("Clans." + clanName + ".Founder", "N/A") : "No Clan";
-            case "clan_name":
-                return (clanName != null) ? clanName : "No Clan";
+            }
+            case "player_money": {
+                return String.valueOf(econ.getBalance(player));
+            }
+            case "clan_leader": {
+                return data.getString("Clans." + clanName + ".Leader", "N/A");
+            }
+            case "clan_founder": {
+                return data.getString("Clans." + clanName + ".Founder", "N/A");
+            }
+            case "clan_name": {
+                return clanName;
+            }
+            case "clan_money": {
+                return data.getString("Clans." + clanName + ".Money");
+            }
+            case "clan_membercount": {
+                List<String> users = data.getStringList("Clans." + clanName + ".Users");
+                return Integer.toString(users.size());
+            }
+            case "clan_membercount_online": {
+                List<String> users = data.getStringList("Clans." + clanName + ".Users");
+                long online = Bukkit.getOnlinePlayers().stream().filter(p -> users.contains(p.getName())).count();
+                return Long.toString(online);
+            }
+            case "clan_membercount_offline": {
+                List<String> users = data.getStringList("Clans." + clanName + ".Users");
+                long online = Bukkit.getOnlinePlayers().stream().filter(p -> users.contains(p.getName())).count();
+                return Long.toString(users.size() - online);
+            }
             default:
-                return null;
+                return "&5&lEnttbot&d&lX";
         }
     }
 
     private String getPlayerClan(String playerName) {
-        ConfigurationSection clansSection = dataConfig.getConfigurationSection("Clans");
-        if (clansSection != null) {
-            for (String clan : clansSection.getKeys(false)) {
-                List<String> users = dataConfig.getStringList("Clans." + clan + ".Users");
-                if (users.contains(playerName)) {
+        if (playerName == null) return null;
+        playerName = playerName.trim().toLowerCase();
+
+        ConfigurationSection clans = data.getConfigurationSection("Clans");
+        if (clans == null) return null;
+
+        for (String clan : clans.getKeys(false)) {
+            List<String> users = data.getStringList("Clans." + clan + ".Users");
+            for (String user : users) {
+                if (user != null && user.trim().toLowerCase().equals(playerName)) {
                     return clan;
                 }
             }
@@ -73,10 +108,6 @@ public class PAPI extends PlaceholderExpansion {
     }
 
     public void registerPlaceholders() {
-        if (!this.register()) {
-            plugin.getLogger().warning("Can't register the placeholders");
-        } else {
-            plugin.getLogger().info("ClansX placeholders registered!");
-        }
+        if (!register()) plugin.getLogger().warning("Failed to register ClansX placeholders.");
     }
 }

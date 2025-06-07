@@ -41,6 +41,7 @@ import java.util.logging.Level;
 import java.util.stream.Collectors;
 import java.util.zip.GZIPOutputStream;
 import javax.net.ssl.HttpsURLConnection;
+
 import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
@@ -59,6 +60,8 @@ public class Metrics {
     * @param serviceId The id of the service. It can be found at <a
     *     href="https://bstats.org/what-is-my-plugin-id">What is my plugin id?</a>
     */
+
+   @SuppressWarnings("deprecated")
    public Metrics(Plugin plugin, int serviceId) {
       this.plugin = plugin;
       // Get the config file
@@ -94,17 +97,12 @@ public class Metrics {
       boolean logResponseStatusText = config.getBoolean("logResponseStatusText", false);
       boolean isFolia = false;
       try {
-         isFolia = Class.forName("io.papermc.paper.threadedregions.RegionizedServer") != null;
-      } catch (Exception e) {
+          Class.forName("io.papermc.paper.threadedregions.RegionizedServer");
+          isFolia = true;
+      } catch (Exception ignored) {
       }
       metricsBase =
-              new // See https://github.com/Bastian/bstats-metrics/pull/126
-                      // See https://github.com/Bastian/bstats-metrics/pull/126
-                      // See https://github.com/Bastian/bstats-metrics/pull/126
-                      // See https://github.com/Bastian/bstats-metrics/pull/126
-                      // See https://github.com/Bastian/bstats-metrics/pull/126
-                      // See https://github.com/Bastian/bstats-metrics/pull/126
-                      // See https://github.com/Bastian/bstats-metrics/pull/126
+              new
                       MetricsBase(
                       "bukkit",
                       serverUUID,
@@ -700,7 +698,7 @@ public class Metrics {
    /**
     * An extremely simple JSON builder.
     *
-    * <p>While this class is neither feature-rich nor the most performant one, it's sufficient enough
+    * <p>While this class is neither feature-rich nor the most performant one, it's sufficient
     * for its use-case.
     */
    public static class JsonObjectBuilder {
